@@ -24,6 +24,7 @@ Here's a basic example of how to use `lua-go` in your Go application:
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -35,8 +36,10 @@ func main() {
 	s := lua.NewState()
 	defer s.Close() // Ensure the Lua state is closed when done
 
+	ctx := context.TODO()
+
 	// Execute some Lua code
-	err := s.Execute(`
+	err := s.Execute(ctx, `
 		message = "Hello from Lua!"
 		x = 10
 		y = 20
@@ -50,11 +53,11 @@ func main() {
 	}
 
 	// Get global variables
-	fmt.Printf("message: %v\n", s.GetGlobal("message")) // Output: Hello from Lua!
-	fmt.Printf("sum: %v\n", s.GetGlobal("sum"))         // Output: 30
+	fmt.Printf("message: %v\n", s.GetGlobal(ctx, "message")) // Output: Hello from Lua!
+	fmt.Printf("sum: %v\n", s.GetGlobal(ctx, "sum"))         // Output: 30
 
 	// Evaluate a Lua expression (calling a function)
-	results, err := s.Evaluate(`return multiply(5, 6)`)
+	results, err := s.Evaluate(ctx, `return multiply(5, 6)`)
 	if err != nil {
 		log.Fatalf("Error evaluating Lua expression: %v", err)
 	}
@@ -63,7 +66,7 @@ func main() {
 	}
 
 	// Evaluate an expression with multiple return values
-	results, err = s.Evaluate(`return "apple", 123, true`)
+	results, err = s.Evaluate(ctx, `return "apple", 123, true`)
 	if err != nil {
 		log.Fatalf("Error evaluating Lua expression: %v", err)
 	}
