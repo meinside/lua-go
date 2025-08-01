@@ -3,7 +3,11 @@
 // Package lua provides a wrapper for running Lua codes.
 package lua
 
-import "github.com/meinside/lua-go/luasrc"
+import (
+	"context"
+
+	"github.com/meinside/lua-go/luasrc"
+)
 
 // State wraps the low-level Lua state.
 type State struct {
@@ -21,16 +25,16 @@ func (s *State) Close() {
 }
 
 // Execute executes a string of Lua code.
-func (s *State) Execute(code string) error {
-	return s.s.Execute(code)
+func (s *State) Execute(ctx context.Context, code string) error {
+	return s.s.Execute(ctx, code)
 }
 
 // GetGlobal gets a global variable from the Lua state.
-func (s *State) GetGlobal(name string) any {
-	return s.s.GetGlobal(name)
+func (s *State) GetGlobal(ctx context.Context, name string) any {
+	return s.s.GetGlobal(ctx, name)
 }
 
 // Evaluate evaluates a string of Lua code and returns its results.
-func (s *State) Evaluate(code string) ([]any, error) {
-	return s.s.Evaluate(code)
+func (s *State) Evaluate(ctx context.Context, code string) ([]any, error) {
+	return s.s.Evaluate(ctx, code)
 }
