@@ -111,12 +111,17 @@ func TestEvaluate(t *testing.T) {
 	}
 
 	// Test multiple return values
-	results, err = s.Evaluate(ctx, `return 1, 'two', true`)
+	results, err = s.Evaluate(ctx, `return 1, 'two', true, {1, 2, 3}, {a = "a", b = "b"}`)
 	if err != nil {
 		t.Fatalf("Evaluate failed with error: %v", err)
 	}
-	if len(results) != 3 || results[0].(int64) != 1 || results[1].(string) != "two" || results[2].(bool) != true {
-		t.Errorf(`Evaluate("return 1, 'two', true") = %v, want [1, "two", true]`, results)
+	if len(results) != 5 ||
+		results[0].(int64) != 1 ||
+		results[1].(string) != "two" ||
+		results[2].(bool) != true ||
+		len(results[3].([]any)) != 3 ||
+		len(results[4].(map[any]any)) != 2 {
+		t.Errorf(`Evaluate("return 1, 'two', true, {1, 2, 3}, {a = \"a\", b = \"b\"") = %v, want [1, "two", true, [1, 2, 3], {a: "a", b: "b"}]`, results)
 	}
 
 	// Test nil return value

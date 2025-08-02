@@ -149,22 +149,7 @@ func (s *State) GetGlobal(ctx context.Context, name string) any {
 		C.lua_getglobal(s.s, cName)
 		defer C.bridge_pop(s.s, 1)
 
-		switch C.lua_type(s.s, -1) {
-		case C.LUA_TSTRING:
-			resultChan <- C.GoString(C.lua_tolstring(s.s, -1, nil))
-		case C.LUA_TBOOLEAN:
-			resultChan <- C.lua_toboolean(s.s, -1) != 0
-		case C.LUA_TNUMBER:
-			if C.lua_isinteger(s.s, -1) != 0 {
-				resultChan <- int64(C.bridge_tointeger(s.s, -1))
-			} else {
-				resultChan <- float64(C.bridge_tonumber(s.s, -1))
-			}
-		case C.LUA_TNIL:
-			resultChan <- nil
-		default:
-			resultChan <- nil // Unsupported type
-		}
+		resultChan <- s.toGoValue(-1)
 	}
 
 	select {
@@ -233,23 +218,7 @@ func (s *State) Evaluate(ctx context.Context, code string) ([]any, error) {
 
 		for i := 0; i < int(numResults); i++ {
 			idx := top + C.int(i) + 1 // Index of the result on the stack
-			switch C.lua_type(s.s, idx) {
-			case C.LUA_TSTRING:
-				results[i] = C.GoString(C.lua_tolstring(s.s, idx, nil))
-			case C.LUA_TBOOLEAN:
-				results[i] = C.lua_toboolean(s.s, idx) != 0
-			case C.LUA_TNUMBER:
-				if C.lua_isinteger(s.s, idx) != 0 {
-					results[i] = int64(C.bridge_tointeger(s.s, idx))
-				} else {
-					results[i] = float64(C.bridge_tonumber(s.s, idx))
-				}
-			case C.LUA_TNIL:
-				results[i] = nil
-			default:
-				// For unsupported types, return nil or an error, or a string representation
-				results[i] = fmt.Sprintf("<unsupported Lua type: %s>", C.GoString(C.lua_typename(s.s, C.lua_type(s.s, idx))))
-			}
+			results[i] = s.toGoValue(idx)
 		}
 
 		// Pop all results from the stack
@@ -266,5 +235,62 @@ func (s *State) Evaluate(ctx context.Context, code string) ([]any, error) {
 		return nil, ctx.Err()
 	case res := <-resultChan:
 		return res.results, res.err
+	}
+}
+
+// toGoValue converts a Lua value at the given index to a Go value.
+// This function must be called from within the locked OS thread.
+func (s *State) toGoValue(idx C.int) any {
+	switch C.lua_type(s.s, idx) {
+	case C.LUA_TSTRING:
+		return C.GoString(C.lua_tolstring(s.s, idx, nil))
+	case C.LUA_TBOOLEAN:
+		return C.lua_toboolean(s.s, idx) != 0
+	case C.LUA_TNUMBER:
+		if C.lua_isinteger(s.s, idx) != 0 {
+			return int64(C.bridge_tointeger(s.s, idx))
+		}
+		return float64(C.bridge_tonumber(s.s, idx))
+	case C.LUA_TTABLE:
+		absIdx := C.lua_absindex(s.s, idx)
+		goMap := make(map[any]any)
+
+		C.lua_pushnil(s.s) // first key
+		for C.lua_next(s.s, absIdx) != 0 {
+			// key is at -2, value is at -1
+			key := s.toGoValue(-2)
+			value := s.toGoValue(-1)
+			goMap[key] = value
+			C.bridge_pop(s.s, 1) // remove value, keep key for next iteration
+		}
+
+		// check if the map can be converted to a slice
+		if len(goMap) > 0 {
+			isSlice := true
+			for i := 1; i <= len(goMap); i++ {
+				if _, ok := goMap[int64(i)]; !ok {
+					isSlice = false
+					break
+				}
+			}
+
+			if isSlice {
+				goSlice := make([]any, len(goMap))
+				for i := 1; i <= len(goMap); i++ {
+					goSlice[i-1] = goMap[int64(i)]
+				}
+				return goSlice
+			}
+		} else {
+			return []any{} // empty table is an empty slice
+		}
+
+		return goMap
+	case C.LUA_TNIL:
+		return nil
+	default:
+		// Return a string representation for other types like function, userdata, etc.
+		// FIXME: support function, userdata, and thread
+		return fmt.Sprintf("<unsupported Lua type: %s>", C.GoString(C.lua_typename(s.s, C.lua_type(s.s, idx))))
 	}
 }

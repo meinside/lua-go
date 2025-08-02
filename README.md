@@ -74,6 +74,10 @@ func main() {
 }
 ```
 
+## Todos
+
+- [ ] Support return types: 'function', 'userdata', and 'thread'.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
