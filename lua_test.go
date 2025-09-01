@@ -6,6 +6,13 @@ import (
 	"time"
 )
 
+// TestVersion tests the Version function.
+func TestVersion(t *testing.T) {
+	if ver := Version(); len(ver) <= 0 {
+		t.Errorf("Version returned an empty string")
+	}
+}
+
 // TestNewStateAndClose creates a new Lua state and then closes it.
 func TestNewStateAndClose(t *testing.T) {
 	s := NewState()

@@ -32,6 +32,10 @@ import (
 )
 
 func main() {
+	// Print version
+	ver := lua.Version()
+	fmt.Printf("version: %s\n", ver)
+
 	// Create a new Lua state
 	s := lua.NewState()
 	defer s.Close() // Ensure the Lua state is closed when done
