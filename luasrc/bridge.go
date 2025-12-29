@@ -31,6 +31,10 @@ static lua_Number bridge_tonumber(lua_State* L, int i) {
 static int bridge_pcall(lua_State* L, int nargs, int nresults, int errfunc) {
   return lua_pcall(L, nargs, nresults, errfunc);
 }
+
+static void bridge_openlibs(lua_State* L) {
+  luaL_openlibs(L);
+}
 */
 import "C"
 
@@ -64,7 +68,7 @@ func NewState() *State {
 		defer runtime.UnlockOSThread()
 
 		s.s = C.luaL_newstate()
-		C.luaL_openlibs(s.s)
+		C.bridge_openlibs(s.s)
 
 		wg.Done()
 

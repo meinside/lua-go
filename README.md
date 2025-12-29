@@ -76,7 +76,10 @@ func main() {
 
 ## Todos
 
-- [ ] Support return types: 'function', 'userdata', and 'thread'.
+- [ ] Support return types:
+  - [ ] `function`
+  - [ ] `userdata`
+  - [ ] `thread`
 
 ## License
 
