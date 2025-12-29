@@ -9,6 +9,11 @@ import (
 	"github.com/meinside/lua-go/luasrc"
 )
 
+// Version returns the Lua version string (e.g., "Lua 5.4.8").
+func Version() string {
+	return luasrc.Version()
+}
+
 // State wraps the low-level Lua state.
 type State struct {
 	s *luasrc.State

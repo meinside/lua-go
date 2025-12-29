@@ -35,6 +35,10 @@ static int bridge_pcall(lua_State* L, int nargs, int nresults, int errfunc) {
 static void bridge_openlibs(lua_State* L) {
   luaL_openlibs(L);
 }
+
+static const char* bridge_get_lua_version_string() {
+  return LUA_RELEASE;
+}
 */
 import "C"
 
@@ -45,6 +49,12 @@ import (
 	"sync"
 	"unsafe"
 )
+
+// Version returns the Lua version string (e.g., "Lua 5.4.8").
+// This function directly accesses the LUA_RELEASE macro from lua.h via Cgo.
+func Version() string {
+	return C.GoString(C.bridge_get_lua_version_string())
+}
 
 // State represents a Lua state.
 type State struct {
