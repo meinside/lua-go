@@ -3,7 +3,7 @@
 # This script downloads the Lua source code, extracts it,
 # and places the necessary files into the '$LUA_SRC_DIR' directory.
 #
-# last update: 2025.11.17.
+# last update: 2025.12.29.
 
 set -e
 
