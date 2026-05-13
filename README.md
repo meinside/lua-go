@@ -1,5 +1,7 @@
 # lua-go
 
+[![test](https://github.com/meinside/lua-go/actions/workflows/test.yml/badge.svg)](https://github.com/meinside/lua-go/actions/workflows/test.yml)
+
 `lua-go` is a Go package that provides a simple and idiomatic wrapper for
 embedding and interacting with the Lua programming language. It allows
 Go applications to execute Lua code, evaluate expressions, call Lua
