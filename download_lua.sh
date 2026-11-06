@@ -3,12 +3,12 @@
 # This script downloads the Lua source code, extracts it,
 # and places the necessary files into the '$LUA_SRC_DIR' directory.
 #
-# last update: 2025.12.29.
+# last update: 2026.11.06.
 
 set -e
 
-LUA_VERSION="5.5.0"
-LUA_URL="http://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz"
+LUA_VERSION="5.5.1"
+LUA_URL="https://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz"
 LUA_TARBALL="lua-${LUA_VERSION}.tar.gz"
 LUA_DIR="lua-${LUA_VERSION}"
 LUA_SRC_DIR="luasrc"
@@ -17,8 +17,8 @@ LUA_SRC_DIR="luasrc"
 echo "Cleaning up old files..."
 rm -f "${LUA_TARBALL}"
 rm -rf "${LUA_DIR}"
-rm -rf "${LUA_SRC_DIR}/*.h"
-rm -rf "${LUA_SRC_DIR}/*.c"
+rm -f "${LUA_SRC_DIR}"/*.h
+rm -f "${LUA_SRC_DIR}"/*.c
 
 echo "Downloading Lua ${LUA_VERSION} from ${LUA_URL}..."
 curl -L -R -O "${LUA_URL}"
