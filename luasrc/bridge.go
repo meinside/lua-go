@@ -153,7 +153,7 @@ import (
 // or when the State is closed concurrently with a pending call.
 var ErrStateClosed = errors.New("lua state is closed")
 
-// Version returns the Lua version string (e.g., "Lua 5.4.8").
+// Version returns the Lua version string (e.g., "Lua 5.5.1").
 // This function directly accesses the LUA_RELEASE macro from lua.h via Cgo.
 func Version() string {
 	return C.GoString(C.bridge_get_lua_version_string())

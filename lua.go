@@ -9,7 +9,7 @@ import (
 	"github.com/meinside/lua-go/luasrc"
 )
 
-// Version returns the Lua version string (e.g., "Lua 5.4.8").
+// Version returns the Lua version string (e.g., "Lua 5.5.1").
 func Version() string {
 	return luasrc.Version()
 }
